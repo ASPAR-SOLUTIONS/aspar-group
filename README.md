@@ -10,8 +10,8 @@ Plateforme de franchises citoyennes en Tunisie.
 ## Organisation du dépôt
 - `/docs` : analyses, specs, mockups
 - `/data` : exemples de données (CSV, JSON)
-- `/backend` et `/frontend` : pour scripts ou maquettes avancées
+- `/backend` : scripts Python pour l'API Airtable
+- `/frontend` : maquettes ou pages statiques
 
 ## Contact & accès
 Merci de garder ce repo privé en phase initiale.
- 
