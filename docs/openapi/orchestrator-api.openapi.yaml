@@ -1,11 +1,11 @@
 openapi: 3.0.3
 info:
   title: NOTORIA Orchestrator API
-  version: 0.3.0
+  version: 0.6.0
 paths:
   /v1/jobs:
     post:
-      summary: Create asynchronous rendering job
+      summary: Create asynchronous rendering job and execute pipeline
       responses:
         '202':
           description: Accepted
@@ -35,6 +35,12 @@ paths:
       responses:
         '200':
           description: OK
+  /webhooks/n8n/order_created:
+    post:
+      summary: n8n intake webhook for order_created
+      responses:
+        '200':
+          description: Job created
   /registry/services:
     get:
       summary: List registry services

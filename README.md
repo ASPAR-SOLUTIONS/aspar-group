@@ -187,6 +187,53 @@ URLs utiles:
 Exemples de checks locaux:
 
 ```bash
-python -m py_compile services/orchestrator-api/app/main.py services/orchestrator-api/app/db.py services/orchestrator-api/app/models.py services/worker-tts/app/main.py services/worker-video/app/main.py services/worker-lipsync/app/main.py services/worker-enhance/app/main.py services/worker-qa/app/main.py shared/worker/template.py shared/schemas/common.py shared/schemas/jobs.py shared/schemas/service_registry.py shared/utils/ids.py shared/utils/logging.py tests/test_common_schemas.py tests/test_ids.py tests/test_registry_schemas.py tests/test_worker_template.py tests/test_worker_tts.py tests/test_worker_video.py tests/test_worker_lipsync.py tests/test_worker_enhance.py tests/test_worker_qa.py
+python -m py_compile services/orchestrator-api/app/main.py services/orchestrator-api/app/db.py services/orchestrator-api/app/models.py services/worker-tts/app/main.py services/worker-video/app/main.py services/worker-lipsync/app/main.py services/worker-enhance/app/main.py services/worker-qa/app/main.py shared/worker/template.py shared/schemas/common.py shared/schemas/jobs.py shared/schemas/service_registry.py shared/utils/ids.py shared/utils/logging.py tests/test_common_schemas.py tests/test_ids.py tests/test_registry_schemas.py tests/test_worker_template.py tests/test_worker_tts.py tests/test_worker_video.py tests/test_worker_lipsync.py tests/test_worker_enhance.py tests/test_worker_qa.py tests/test_orchestrator_pipeline.py
 python -m unittest discover -s tests -p 'test_*.py'
 ```
+
+
+## Pipeline orchestrator (V1)
+Étapes exécutées par l'orchestrator:
+1. `script_agent` (LLM stub) -> `spoken_script` + `timing_map`
+2. `tts` -> `voice.wav`
+3. `video` -> `avatar_base.mp4`
+4. `lipsync` -> `avatar_lipsynced.mp4`
+5. `enhance` -> `enhanced.mp4`
+6. `qa` -> pass/fail + report
+7. `delivery` -> URLs finales des assets
+
+### Routing services
+- Résolution des workers via Service Registry par `category` (`tts|video|lipsync|enhance|qa`).
+- Vérification `GET /health` avant dispatch worker.
+- Dispatch `POST /generate`.
+- Fallback vers `fallback_service` en cas de timeout/erreur 5xx.
+- Retries par step: `max 2` (configurable via `ORCHESTRATOR_MAX_RETRIES`).
+
+
+## n8n intake webhook
+Endpoint: `POST /webhooks/n8n/order_created`
+
+Payload minimal:
+```json
+{
+  "customer_id": "cust_123",
+  "avatar_id": "avatar_fr_01",
+  "script": "Bonjour, ceci est votre vidéo personnalisée.",
+  "language": "fr",
+  "format": "mp4",
+  "plan": "pro"
+}
+```
+
+Réponse:
+```json
+{
+  "job_id": "<uuid>",
+  "status_url": "/v1/jobs/<uuid>"
+}
+```
+
+Exemple workflow n8n: `docs/n8n/workflow.order_created.json`
+- reçoit formulaire
+- appelle le webhook orchestrator
+- notifie Slack/Email avec `job_id`
