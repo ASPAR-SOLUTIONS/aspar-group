@@ -1,0 +1,15 @@
+# Environment
+.env
+credentials/
+
+# Output (généré automatiquement)
+output/
+logs/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
