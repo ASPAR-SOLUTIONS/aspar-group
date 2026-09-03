@@ -1,4 +1,8 @@
-# aspar-group# Aspar Group Platform – MVP
+# Aspar Group Platform – MVP
+
+## Salut !
+
+Bienvenue sur la plateforme Aspar Group.
 
 Plateforme de franchises citoyennes en Tunisie.
 
