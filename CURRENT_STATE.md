@@ -33,7 +33,7 @@ Near-term personal income target discussed: **5,000 TND/month**. This is a comme
 
 ## Core stack status
 - **GitHub:** durable context, architecture, decisions, versioning.
-- **LangGraph + LangChain:** executable deterministic pre-execution gate migrated to `agent-os/langgraph/`; SOURCE_LOCK PASS/STOP, conditional routing, LangChain tools, in-memory checkpointing, optional PostgresSaver, `langgraph.json`, CLI dependency and smoke runner are present.
+- **LangGraph + LangChain:** executable deterministic pre-execution gate is now consolidated under `agent-os/langgraph/`; SOURCE_LOCK PASS/STOP, conditional routing, LangChain tools, in-memory checkpointing, optional PostgresSaver, `langgraph.json`, CLI dependency and smoke runner are present.
 - **Odoo:** intended operational center for CRM, projects, commercial operations, accounting/finance, sales, POS, stock and related business processes.
 - **Drive:** evidence, source documents, archives and heavy assets.
 - **Canva:** design production.
@@ -42,10 +42,18 @@ Near-term personal income target discussed: **5,000 TND/month**. This is a comme
 - **Supabase:** optional technical backend; not mandatory for every workflow.
 - **Notion:** outside core; retained only as legacy/reference/demo/client-use where useful.
 
-## LangGraph verification
-The source gate was previously verified on Python 3.12 with 7 passing tests and smoke output `{"pass_path": "PASS", "status": "ok", "stop_path": "STOP"}`. The migration into this canonical repository must be re-verified by this repository's CI before being considered complete.
+## Canonical LangGraph verification
+Target-repository GitHub Actions run `34694733008` verified the migrated gate on Python 3.12:
+- `8 passed in 0.39s`;
+- smoke output: `{"pass_path": "PASS", "status": "ok", "stop_path": "STOP"}`;
+- LangChain, LangGraph, LangGraph CLI/in-memory runtime and PostgreSQL checkpoint dependencies installed successfully.
+
+The migration used a relocation-specific RED test first: before `brands/majdi-personal-brand/SOURCE_LOCK.md` was added to the canonical repository, the suite produced the expected STOP failures. Adding the canonical source made the same gate green without weakening the validation rules.
 
 The EXECUTE node intentionally remains `preflight_only`: it returns an execution-ready contract and does not itself call Canva/image/social side effects.
+
+## Legacy NOTORIA
+The former NOTORIA V1 orchestrator/media-worker monorepo is preserved under `archive/notoria-v1/` for reference. It is not active ASPAR runtime; TTS/video/lipsync workers must not be enabled by default.
 
 ## Constraints
 - Avoid new paid tools unless they replace an existing cost/function or unlock a direct sale/delivery requirement.
@@ -55,4 +63,4 @@ The EXECUTE node intentionally remains `preflight_only`: it returns an execution
 - Side-effecting visual/content execution must continue to respect the SOURCE_LOCK contract and must not bypass missing canonical sources.
 
 ## Current architectural gap
-The gate is implemented and is being re-verified in its canonical repository. The remaining integration work after green CI is to make local Claude Code/MCP and downstream execution surfaces call this gate as their mandatory entry point, then add concrete source adapters only when required.
+The canonical Agent OS repository migration is CI-verified. The remaining integration work is local/runtime wiring: make Claude Code/MCP and downstream execution surfaces call `agent-os/langgraph/` as their mandatory entry point, then add concrete source adapters only when a real workflow requires them.
