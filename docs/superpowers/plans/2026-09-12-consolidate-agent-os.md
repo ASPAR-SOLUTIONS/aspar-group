@@ -4,7 +4,7 @@
 
 **Goal:** Consolidate the verified ASPAR LangGraph/LangChain gate and the useful NOTORIA orchestration work into `ASPAR-SOLUTIONS/aspar-group` so Claude and ChatGPT use one repository and one shared execution area.
 
-**Architecture:** `aspar-group` becomes the canonical repository. Active orchestration lives in `agent-os/`; the verified LangGraph pre-execution gate lives in `agent-os/langgraph/`; the older NOTORIA V1 monorepo is preserved under `archive/notoria-v1/` and is not active runtime. Shared ASPAR context and SOURCE LOCK files live at repository root so Claude and ChatGPT read the same durable context.
+**Architecture:** `aspar-group` is the canonical repository. Active orchestration lives in `agent-os/`; the verified LangGraph pre-execution gate lives in `agent-os/langgraph/`; the older NOTORIA V1 monorepo is preserved under `archive/notoria-v1/` and is not active runtime. Shared ASPAR context and SOURCE LOCK files live at repository root so Claude and ChatGPT read the same durable context.
 
 **Tech Stack:** Python 3.12, LangGraph, LangChain, pytest, PostgreSQL checkpointer, GitHub Actions, Claude Code agent files.
 
@@ -28,9 +28,9 @@
 - Create: `CLAUDE.md`
 - Create/replace: root ASPAR context files
 
-- [ ] Add the common Agent OS contract and source provenance.
-- [ ] Put Claude and ChatGPT on the same repository-level context.
-- [ ] Verify paths and source commit references.
+- [x] Add the common Agent OS contract and source provenance.
+- [x] Put Claude and ChatGPT on the same repository-level context.
+- [x] Verify paths and source commit references.
 
 ### Task 2: Migrate verified LangGraph gate
 
@@ -40,29 +40,39 @@
 - Create: `agent-os/langgraph/src/aspar_agent/*`
 - Create: `agent-os/langgraph/tests/test_preexecution_gate.py`
 
-- [ ] Copy the already-tested source without behavior changes.
-- [ ] Preserve PASS/STOP SOURCE LOCK routing.
-- [ ] Add CI in the target repository.
+- [x] Copy the verified gate into the canonical repository with relocation-only path adaptations.
+- [x] Preserve PASS/STOP SOURCE LOCK routing.
+- [x] Add CI in the target repository.
 
 ### Task 3: Preserve legacy NOTORIA V1 safely
 
 **Files:**
 - Create: `archive/notoria-v1/` from source tree commit `8486a7d577631fca6434fcac33217c870d629c9d`.
 
-- [ ] Preserve the old orchestrator/workers for reference.
-- [ ] Mark it legacy and non-active.
+- [x] Preserve the old orchestrator/workers for reference.
+- [x] Mark it legacy and non-active.
 
 ### Task 4: Unify Claude workspace
 
 **Files:**
-- Create: `.claude/agents/` from the existing Claude branch where useful.
+- Create: `.claude/agents/` from branch `claude/aspar-social-media-pipeline-756wh`.
 
-- [ ] Keep Claude agent definitions accessible in the same repository.
-- [ ] Make `CLAUDE.md` point to `agent-os/` and root context.
+- [x] Keep Claude agent definitions accessible in the same repository.
+- [x] Make `CLAUDE.md` point to `agent-os/` and root context.
 
 ### Task 5: Verification
 
-- [ ] Open a PR from `consolidate/agent-os-notoria` to `main`.
-- [ ] Run GitHub Actions tests for `agent-os/langgraph`.
-- [ ] Confirm pytest and smoke test PASS before merge.
-- [ ] Do not claim completion until CI evidence is available.
+- [x] Open PR #4 from `consolidate/agent-os-notoria` to `main`.
+- [x] Run GitHub Actions tests for `agent-os/langgraph`.
+- [x] Confirm pytest and smoke test PASS before merge.
+- [x] Record evidence before claiming completion.
+
+## Verification evidence
+
+Target-repository GitHub Actions run `34694733008`, job `103556151210`, completed successfully on Python 3.12:
+
+- `8 passed in 0.39s`
+- smoke: `{"pass_path": "PASS", "status": "ok", "stop_path": "STOP"}`
+- package install succeeded with LangChain, LangGraph, LangGraph CLI/in-memory runtime, PostgreSQL checkpointer and psycopg extras.
+
+The earlier RED run failed exactly because the canonical root Majdi SOURCE LOCK had not yet been migrated; adding that canonical source turned the relocation test suite green without weakening the gate.
